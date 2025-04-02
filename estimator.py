@@ -1,26 +1,55 @@
+import openai
+import os
 import time
+from constants import PRUDENTAI_DEFAULT_CONFIDENCE, EXAMPLE_RISK_FACTORS, HISTORICAL_REVIEW_NOTE
+
+# تأكد من أن مفتاح GPT مضاف إلى بيئة النظام أو داخل Streamlit Secrets
+openai.api_key = os.getenv("OPENAI_API_KEY")
+
 
 def run_prudent_estimator(sow_file):
-    # محاكاة تحليل نطاق العمل وتقدير التكلفة الذكية
-    # هذه الوظيفة ستحل محلها GPT لاحقاً
-    time.sleep(2)  # لتوضيح أنه يتم المعالجة
-    
-    estimated_cost = 523_750_000  # رقم تمثيلي لحين إدخال التحليل الذكي
-    confidence = "مرتفعة"
-    risk_factors = [
-        "مدة التنفيذ قصيرة",
-        "الأسعار العالمية غير مستقرة",
-        "الموقع بعيد عن الموردين"
-    ]
-    
-    justification = (
-        "تم استخدام نموذج PrudentAI الذي يقوم بتفكيك نطاق العمل، "
-        "ويُقدر الأسعار بناءً على السوق، ويضيف هامش حذر محسوب وفق المخاطر المتوقعة."
-    )
+    """
+    الذكاء الفعلي لسيناريو PrudentAI
+    يحلل نطاق العمل ويُنتج سعر تقديري مع مبررات واضحة
+    """
+    # اقرأ النص من ملف نطاق العمل (بشكل مبسط حالياً)
+    sow_text = sow_file.read().decode("utf-8", errors="ignore")
 
-    return {
-        "السعر التقديري": f"{estimated_cost:,.0f} ريال",
-        "درجة الثقة": confidence,
-        "عوامل الحذر": risk_factors,
-        "شرح القرار": justification
-    }
+    prompt = f"""
+    أنت مهندس تسعير ذكي. أمامك نطاق عمل لمشروع. قم بتقدير تكلفة تنفيذ هذا المشروع كنظام تسليم مفتاح.
+
+    نطاق العمل:
+    {sow_text}
+
+    المطلوب:
+    - تقدير تكلفة إجمالية معقولة (بالريال)
+    - توضيح عوامل الخطر أو الحذر (إن وجدت)
+    - درجة الثقة (مرتفعة / متوسطة / منخفضة)
+    - شرح منطقي مختصر لقرار التسعير
+
+    النتيجة المطلوبة بصيغة JSON فقط دون شرح إضافي:
+    {{
+      "السعر التقديري": "... ريال",
+      "درجة الثقة": "...",
+      "عوامل الحذر": ["..."],
+      "شرح القرار": "..."
+    }}
+    """
+
+    try:
+        response = openai.ChatCompletion.create(
+            model="gpt-4",
+            messages=[{"role": "user", "content": prompt}],
+            temperature=0.4,
+        )
+        result = response.choices[0].message.content
+        return eval(result)
+    
+    except Exception as e:
+        return {
+            "السعر التقديري": "تعذر التقدير",
+            "درجة الثقة": PRUDENTAI_DEFAULT_CONFIDENCE,
+            "عوامل الحذر": EXAMPLE_RISK_FACTORS,
+            "شرح القرار": f"حدث خطأ أثناء تنفيذ الذكاء: {e}"
+        }
+
