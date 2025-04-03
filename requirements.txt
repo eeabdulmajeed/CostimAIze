@@ -1,6 +1,0 @@
-
-streamlit
-pandas
-PyMuPDF
-docx2txt
-openai>=1.0.0
