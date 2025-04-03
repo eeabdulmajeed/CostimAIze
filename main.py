@@ -3,7 +3,6 @@ import streamlit as st
 import pandas as pd
 from costimaize_v8_main_full import CostimAIzeOrchestrator
 
-# إعداد الصفحة
 st.set_page_config(page_title="CostimAIze V8", layout="wide")
 
 # --- الشعار والهوية ---
@@ -20,7 +19,7 @@ st.markdown(
 
 st.markdown("---")
 
-# اختيار نوع الخدمة
+# --- اختيار نوع الخدمة ---
 service = st.radio("اختر نوع الخدمة التي ترغب بها:", ["", "تقدير تكلفة", "تحليل سعري لعطاء"], horizontal=True)
 
 if service == "تقدير تكلفة":
@@ -30,20 +29,21 @@ if service == "تقدير تكلفة":
     st.markdown("### معلومات المشروع")
     col1, col2 = st.columns(2)
     with col1:
-        project_type = st.text_input("نوع المشروع", placeholder="مثال: 132kV Substation")
+        project_type = st.selectbox("نوع المشروع", ["", "محطة", "كابلات", "خطوط هوائية", "أخرى"])
         location = st.text_input("الموقع الجغرافي")
     with col2:
-        year = st.text_input("سنة التنفيذ", placeholder="مثال: 2025")
+        duration = st.text_input("فترة التنفيذ", placeholder="مثال: 18 شهر")
         project_code = st.text_input("رقم المشروع (اختياري)")
 
-    st.markdown("### تحميل جدول أسعار تاريخية (اختياري)")
-    hist_file = st.file_uploader("ارفع جدول أسعار بصيغة CSV", type=["csv"])
+    if project_type == "أخرى":
+        other_description = st.text_input("يرجى وصف نوع المشروع")
+
+    misc_notes = st.text_area("معلومات أخرى (اختياري)", height=100)
 
     if st.button("تشغيل التقدير الذكي") and sow_file:
         st.success("جاري تنفيذ التقدير عبر CostimAIzeOrchestrator ...")
         orchestrator = CostimAIzeOrchestrator()
-        # تنفيذ منطقي لاحقًا بعد قراءة SOW فعليًا
-        orchestrator.run_estimation("Placeholder SOW text", [])  # ربط لاحقًا بالملف الحقيقي
+        orchestrator.run_estimation("Placeholder SOW text", [])  # لاحقاً يتم ربط الملف فعلياً
 
 elif service == "تحليل سعري لعطاء":
     st.markdown("### تحميل ملف نطاق العمل (SOW)")
@@ -54,9 +54,15 @@ elif service == "تحليل سعري لعطاء":
 
     if st.button("تشغيل التحليل السعري") and sow_file and bid_file:
         st.success("جاري تحليل العرض باستخدام CostimAIze V8...")
-        # سيتم الربط لاحقًا
 
-else:
-    st.info("يرجى اختيار نوع الخدمة للمتابعة.")
+# --- صفحة أرشفة الأسعار التاريخية ---
+st.markdown("---")
+st.subheader("أرشيف الأسعار التاريخية")
+archive_file = st.file_uploader("ارفع ملف أسعار تاريخية جديد (CSV)", type=["csv"])
+if archive_file:
+    st.success("تم حفظ الملف في الأرشيف الداخلي.")
 
-# المكونات الأخرى لا تظهر إلا بعد تنفيذ التحليل الحقيقي أو التقدير
+# --- Dashboard مبدئي ---
+st.markdown("---")
+st.subheader("لوحة المتابعة Dashboard")
+st.markdown("يتم عرض النتائج والتوصيات هنا بعد التشغيل الفعلي.")
