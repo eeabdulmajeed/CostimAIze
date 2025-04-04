@@ -1,6 +1,0 @@
-streamlit
-pandas
-openpyxl
-matplotlib
-docx2txt
-PyMuPDF
