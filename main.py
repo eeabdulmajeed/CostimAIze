@@ -1,12 +1,12 @@
 
 def download_csv(df, label, filename):
     if not df.empty:
-    st.download_button(
-    label=label,
-    data=df.to_csv(index=False).encode('utf-8'),
-    file_name=filename,
-    mime="text/csv"
-    )
+        st.download_button(
+            label=label,
+            data=df.to_csv(index=False).encode('utf-8'),
+            file_name=filename,
+            mime="text/csv"
+        )
 
 
 
