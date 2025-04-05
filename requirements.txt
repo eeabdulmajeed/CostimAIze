@@ -1,9 +1,0 @@
-streamlit
-pandas
-numpy
-scikit-learn
-PyMuPDF
-docx2txt
-python-docx
-openpyxl
-xlsxwriter
