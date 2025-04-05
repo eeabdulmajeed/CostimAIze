@@ -1,9 +1,0 @@
-PyMuPDF
-docx2txt
-numpy
-openpyxl
-pandas
-python-docx
-scikit-learn
-streamlit
-xlsxwriter
